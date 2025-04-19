@@ -3,11 +3,6 @@ export function openModal(popup) {
   popup.classList.add("popup_is-opened");
   document.addEventListener("keydown", escClose);
   popup.addEventListener("mousedown", overlayClose);
-
-  const firstInput = popup.querySelector("input");
-  if (firstInput) {
-    firstInput.focus();
-  }
 }
 
 // Функция закрытия попапа

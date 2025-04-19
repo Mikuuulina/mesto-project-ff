@@ -1,10 +1,12 @@
 import "./pages/index.css";
+import { initialCards } from "./scripts/cards.js";
+
 import {
-  initialCards,
+  cardTemplate,
   createCard,
   deleteCard,
   toggleLike,
-} from "./scripts/cards.js";
+} from "./scripts/card.js";
 
 import {
   openModal,
@@ -13,30 +15,62 @@ import {
   overlayClose,
 } from "./scripts/modal.js";
 
+// Список карточек
 const placesList = document.querySelector(".places__list");
 
-// Выведение карточки на страницу
+// Переменные для модального окна редактирования профидя
+const modalEdit = document.querySelector(".popup_type_edit");
+const profileTitle = document.querySelector(".profile__title");
+const profileDescription = document.querySelector(".profile__description");
+const buttonOpenPopupEdit = document.querySelector(".profile__edit-button");
+const buttonClosePopupEdit = modalEdit.querySelector(".popup__close");
+const formPopupEdit = modalEdit.querySelector("form");
+const nameInput = formPopupEdit.querySelector(".popup__input_type_name");
+const jobInput = formPopupEdit.querySelector(".popup__input_type_description");
+
+// Переменные для формы добавления карточек
+
+const modalCard = document.querySelector(".popup_type_new-card");
+const buttonOpenPopupNewCard = document.querySelector(".profile__add-button");
+const buttonClosePopupNewCard = modalCard.querySelector(".popup__close");
+const formAddCard = modalCard.querySelector("form");
+const inputName = formAddCard.querySelector(".popup__input_type_card-name");
+const inputLink = formAddCard.querySelector(".popup__input_type_url");
+
+// Переменные для попапа с изображениями
+
+const modalImage = document.querySelector(".popup_type_image");
+const popupImage = modalImage.querySelector(".popup__image");
+const popupCaptionImage = modalImage.querySelector(".popup__caption");
+
+// Функция открытия попапа карточки с изображением
+
+function handleCardClick(name, link) {
+  popupImage.src = link;
+  popupImage.alt = name;
+  popupCaptionImage.textContent = name;
+  modalImage.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
+  openModal(modalImage);
+}
+
+// Обработчики
+
+// Выведение карточек на страницу
+
 initialCards.forEach((card) => {
   const cardItem = createCard(card, deleteCard, toggleLike, handleCardClick);
   placesList.append(cardItem);
 });
 
-// Модальное окно редактирования профиля
+// Редактирование профиля
 
-const modalEdit = document.querySelector(".popup_type_edit");
-const editOpener = document.querySelector(".profile__edit-button");
-const editCloser = modalEdit.querySelector(".popup__close");
-const formElement = modalEdit.querySelector("form");
-const nameInput = formElement.querySelector(".popup__input_type_name");
-const jobInput = formElement.querySelector(".popup__input_type_description");
-
-editOpener.addEventListener("click", () => {
-  nameInput.value = document.querySelector(".profile__title").textContent;
-  jobInput.value = document.querySelector(".profile__description").textContent;
+buttonOpenPopupEdit.addEventListener("click", () => {
+  nameInput.value = profileTitle.textContent;
+  jobInput.value = profileDescription.textContent;
   openModal(modalEdit);
 });
 
-editCloser.addEventListener("click", () => closeModal(modalEdit));
+buttonClosePopupEdit.addEventListener("click", () => closeModal(modalEdit));
 
 modalEdit.addEventListener("click", (evt) => {
   if (evt.target === modalEdit) {
@@ -44,28 +78,17 @@ modalEdit.addEventListener("click", (evt) => {
   }
 });
 
-formElement.addEventListener("submit", (evt) => {
+formPopupEdit.addEventListener("submit", (evt) => {
   evt.preventDefault();
-  const nameValue = nameInput.value;
-  const jobValue = jobInput.value;
-
-  document.querySelector(".profile__title").textContent = nameValue;
-  document.querySelector(".profile__description").textContent = jobValue;
-
+  profileTitle.textContent = nameInput.value;
+  profileDescription.textContent = jobInput.value;
   closeModal(modalEdit);
 });
 
-// Форма добавления карточки
-const modalCard = document.querySelector(".popup_type_new-card");
-const cardOpener = document.querySelector(".profile__add-button");
-const cardCloser = modalCard.querySelector(".popup__close");
+// Добавление новой карточки
 
-cardOpener.addEventListener("click", () => openModal(modalCard));
-cardCloser.addEventListener("click", () => closeModal(modalCard));
-
-const formAddCard = modalCard.querySelector("form");
-const inputName = formAddCard.querySelector(".popup__input_type_card-name");
-const inputLink = formAddCard.querySelector(".popup__input_type_url");
+buttonOpenPopupNewCard.addEventListener("click", () => openModal(modalCard));
+buttonClosePopupNewCard.addEventListener("click", () => closeModal(modalCard));
 
 formAddCard.addEventListener("submit", (evt) => {
   evt.preventDefault();
@@ -73,43 +96,26 @@ formAddCard.addEventListener("submit", (evt) => {
   const name = inputName.value;
   const link = inputLink.value;
 
-  const newCard = createCard({ name, link }, deleteCard, toggleLike);
+  const newCard = createCard(
+    { name, link },
+    deleteCard,
+    toggleLike,
+    handleCardClick
+  );
   placesList.prepend(newCard);
 
   formAddCard.reset();
   closeModal(modalCard);
 });
 
-// Открытие попапа с картинкой
-const modalImage = document.querySelector(".popup_type_image");
-const popupImage = modalImage.querySelector(".popup__image");
-const popupCaption = modalImage.querySelector(".popup__caption");
-
-function handleCardClick(name, link) {
-  popupImage.src = link;
-  popupImage.alt = name;
-  popupCaption.textContent = name;
-  modalImage.classList.add("popup_is-opened");
-  modalImage.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
-
-  document.addEventListener("keydown", escCloseImage);
-}
-
-function escCloseImage(evt) {
-  if (evt.key === "Escape") {
-    modalImage.classList.remove("popup_is-opened");
-    modalImage.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-    document.removeEventListener("keydown", escCloseImage);
-  }
-}
+// Попап с изображением
 
 modalImage.addEventListener("click", (evt) => {
   if (
     evt.target === modalImage ||
     evt.target.classList.contains("popup__close")
   ) {
-    modalImage.classList.remove("popup_is-opened");
     modalImage.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-    document.removeEventListener("keydown", escCloseImage);
+    closeModal(modalImage);
   }
 });
