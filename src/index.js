@@ -15,6 +15,8 @@ import {
   overlayClose,
 } from "./scripts/modal.js";
 
+import { enableValidation, clearValidation } from "./scripts/validation.js";
+
 // Список карточек
 const placesList = document.querySelector(".places__list");
 
@@ -27,6 +29,7 @@ const buttonClosePopupEdit = modalEdit.querySelector(".popup__close");
 const formPopupEdit = modalEdit.querySelector("form");
 const nameInput = formPopupEdit.querySelector(".popup__input_type_name");
 const jobInput = formPopupEdit.querySelector(".popup__input_type_description");
+const profileForm = modalEdit.querySelector(".popup__form");
 
 // Переменные для формы добавления карточек
 
@@ -42,6 +45,16 @@ const inputLink = formAddCard.querySelector(".popup__input_type_url");
 const modalImage = document.querySelector(".popup_type_image");
 const popupImage = modalImage.querySelector(".popup__image");
 const popupCaptionImage = modalImage.querySelector(".popup__caption");
+
+// Настройки валидации формы
+const validationConfig = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+};
 
 // Функция открытия попапа карточки с изображением
 
@@ -67,6 +80,7 @@ initialCards.forEach((card) => {
 buttonOpenPopupEdit.addEventListener("click", () => {
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
+  clearValidation(profileForm, validationConfig);
   openModal(modalEdit);
 });
 
@@ -119,3 +133,6 @@ modalImage.addEventListener("click", (evt) => {
     closeModal(modalImage);
   }
 });
+
+// Включение валидации всех форм
+enableValidation(validationConfig);
