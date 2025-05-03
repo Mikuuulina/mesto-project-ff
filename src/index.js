@@ -17,8 +17,12 @@ import {
 
 import { enableValidation, clearValidation } from "./scripts/validation.js";
 
+import { getUserInfo } from "./scripts/api.js";
+
 // Список карточек
 const placesList = document.querySelector(".places__list");
+
+const profileAvatar = document.querySelector(".profile__image");
 
 // Переменные для модального окна редактирования профидя
 const modalEdit = document.querySelector(".popup_type_edit");
@@ -66,6 +70,16 @@ function handleCardClick(name, link) {
   openModal(modalImage);
 }
 
+// Вызов функции загрузки и отображения данных пользователя
+getUserInfo()
+  .then((data) => {
+    console.log(data);
+    profileTitle.textContent = data.name;
+    profileDescription.textContent = data.about;
+    profileAvatar.style.backgroundImage = `url(${data.avatar})`;
+  })
+  .catch((err) => console.error(err));
+
 // Обработчики
 
 // Выведение карточек на страницу
@@ -101,7 +115,11 @@ formPopupEdit.addEventListener("submit", (evt) => {
 
 // Добавление новой карточки
 
-buttonOpenPopupNewCard.addEventListener("click", () => openModal(modalCard));
+buttonOpenPopupNewCard.addEventListener("click", () => {
+  formAddCard.reset();
+  clearValidation(formAddCard, validationConfig);
+  openModal(modalCard);
+});
 buttonClosePopupNewCard.addEventListener("click", () => closeModal(modalCard));
 
 formAddCard.addEventListener("submit", (evt) => {
