@@ -6,20 +6,22 @@ const config = {
   },
 };
 
+// Функция обработки ответа
+const handleResponse = (res) => {
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`Ошибка: ${res.status}`);
+};
+
 export const getUserInfo = () => {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: config.headers,
-  })
-    .then((res) => {
-      if (!res.ok) {
-        return Promise.reject("Ошибка получения данных");
-      }
-      return res.json();
-    })
-    .then((data) => {
-      return data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  }).then(handleResponse);
+};
+
+export const getInitialCards = () => {
+  return fetch(`${config.baseUrl}/cards`, {
+    headers: config.headers,
+  }).then(handleResponse);
 };

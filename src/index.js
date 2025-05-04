@@ -17,7 +17,7 @@ import {
 
 import { enableValidation, clearValidation } from "./scripts/validation.js";
 
-import { getUserInfo } from "./scripts/api.js";
+import { getUserInfo, getInitialCards } from "./scripts/api.js";
 
 // Список карточек
 const placesList = document.querySelector(".places__list");
@@ -71,12 +71,27 @@ function handleCardClick(name, link) {
 }
 
 // Вызов функции загрузки и отображения данных пользователя
-getUserInfo()
-  .then((data) => {
-    console.log(data);
-    profileTitle.textContent = data.name;
-    profileDescription.textContent = data.about;
-    profileAvatar.style.backgroundImage = `url(${data.avatar})`;
+let userId;
+
+Promise.all([getUserInfo(), getInitialCards()])
+  .then(([userData, cards]) => {
+    console.log(userData);
+    console.log(cards);
+    userId = userData._id;
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
+    profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
+
+    cards.reverse().forEach((card) => {
+      const cardElement = createCard(
+        card,
+        deleteCard,
+        toggleLike,
+        handleCardClick,
+        userId
+      );
+      placesList.append(cardElement);
+    });
   })
   .catch((err) => console.error(err));
 
@@ -84,10 +99,10 @@ getUserInfo()
 
 // Выведение карточек на страницу
 
-initialCards.forEach((card) => {
-  const cardItem = createCard(card, deleteCard, toggleLike, handleCardClick);
-  placesList.append(cardItem);
-});
+// initialCards.forEach((card) => {
+//   const cardItem = createCard(card, deleteCard, toggleLike, handleCardClick);
+//   placesList.append(cardItem);
+// });
 
 // Редактирование профиля
 
@@ -132,7 +147,8 @@ formAddCard.addEventListener("submit", (evt) => {
     { name, link },
     deleteCard,
     toggleLike,
-    handleCardClick
+    handleCardClick,
+    userId
   );
   placesList.prepend(newCard);
 
