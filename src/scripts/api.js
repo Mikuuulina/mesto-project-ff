@@ -25,3 +25,26 @@ export const getInitialCards = () => {
     headers: config.headers,
   }).then(handleResponse);
 };
+
+export const editUserInfo = (name, about) => {
+  return fetch(`${config.baseUrl}/users/me`, {
+    method: "PATCH",
+    headers: config.headers,
+    body: JSON.stringify({ name, about }),
+  }).then(handleResponse);
+};
+
+export const addNewCard = (name, link) => {
+  return fetch(`${config.baseUrl}/cards`, {
+    method: "POST",
+    headers: config.headers,
+    body: JSON.stringify({ name, link }),
+  }).then(handleResponse);
+};
+
+export const deleteCardFromApi = (cardId) => {
+  return fetch(`${config.baseUrl}/cards/${cardId}`, {
+    method: "DELETE",
+    headers: config.headers,
+  }).then(handleResponse);
+};

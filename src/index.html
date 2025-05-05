@@ -67,6 +67,14 @@
   </div>
 </div>
 
+<div class="popup popup_type__card_delete">
+  <div class="popup__content popup__content_content_card_delete">
+    <button type="button" class="popup__close popup__close_card_delete"></button>
+    <h3 class="popup__title">Вы уверены?</h3>
+    <button type="submit" class="button popup__button popup__button_card_delete">Да</button>
+  </div>
+</div>
+
 <template id="card-template">
   <li class="places__item card">
     <img class="card__image" src="" alt="" />
@@ -74,7 +82,10 @@
     <div class="card__description">
       <h2 class="card__title">
       </h2>
-      <button type="button" class="card__like-button"></button>
+      <div class="card__like-container">
+        <button type="button" class="card__like-button"></button>
+        <span class="card__like-count"></span>
+      </div>
     </div>
   </li>
 </template>

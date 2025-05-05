@@ -17,7 +17,13 @@ import {
 
 import { enableValidation, clearValidation } from "./scripts/validation.js";
 
-import { getUserInfo, getInitialCards } from "./scripts/api.js";
+import {
+  getUserInfo,
+  getInitialCards,
+  editUserInfo,
+  addNewCard,
+  deleteCardFromApi,
+} from "./scripts/api.js";
 
 // Список карточек
 const placesList = document.querySelector(".places__list");
@@ -50,6 +56,16 @@ const modalImage = document.querySelector(".popup_type_image");
 const popupImage = modalImage.querySelector(".popup__image");
 const popupCaptionImage = modalImage.querySelector(".popup__caption");
 
+// Переменные для попапа удаления карточки
+const modalDelete = document.querySelector(".popup_type__card_delete");
+const buttonClosePopupDelete = modalDelete.querySelector(
+  ".popup__close_card_delete"
+);
+const buttonDeleteCard = modalDelete.querySelector(
+  ".popup__button_card_delete"
+);
+let currentCardId = null;
+
 // Настройки валидации формы
 const validationConfig = {
   formSelector: ".popup__form",
@@ -70,6 +86,30 @@ function handleCardClick(name, link) {
   openModal(modalImage);
 }
 
+// // Открытие попапа удаления
+function openDeletePopup(cardData) {
+  currentCardId = cardData._id;
+  openModal(modalDelete);
+
+  const onDelete = () => {
+    deleteCard(cardData.element);
+    deleteCardFromApi(currentCardId);
+    closeModal(modalDelete);
+    buttonDeleteCard.removeEventListener("click", onDelete);
+  };
+
+  buttonDeleteCard.addEventListener("click", onDelete);
+}
+
+// // Закрытие попапа удаления карточки
+buttonClosePopupDelete.addEventListener("click", () => closeModal(modalDelete));
+
+modalDelete.addEventListener("click", (evt) => {
+  if (evt.target === modalDelete) {
+    closeModal(modalDelete);
+  }
+});
+
 // Вызов функции загрузки и отображения данных пользователя
 let userId;
 
@@ -88,21 +128,13 @@ Promise.all([getUserInfo(), getInitialCards()])
         deleteCard,
         toggleLike,
         handleCardClick,
+        openDeletePopup,
         userId
       );
       placesList.append(cardElement);
     });
   })
   .catch((err) => console.error(err));
-
-// Обработчики
-
-// Выведение карточек на страницу
-
-// initialCards.forEach((card) => {
-//   const cardItem = createCard(card, deleteCard, toggleLike, handleCardClick);
-//   placesList.append(cardItem);
-// });
 
 // Редактирование профиля
 
@@ -121,11 +153,20 @@ modalEdit.addEventListener("click", (evt) => {
   }
 });
 
+// Обработчик отправки формы редактирования профиля
 formPopupEdit.addEventListener("submit", (evt) => {
   evt.preventDefault();
-  profileTitle.textContent = nameInput.value;
-  profileDescription.textContent = jobInput.value;
-  closeModal(modalEdit);
+
+  const newName = nameInput.value;
+  const newJob = jobInput.value;
+
+  editUserInfo(newName, newJob)
+    .then((editedUser) => {
+      profileTitle.textContent = editedUser.name;
+      profileDescription.textContent = editedUser.about;
+      closeModal(modalEdit);
+    })
+    .catch((err) => console.error(err));
 });
 
 // Добавление новой карточки
@@ -143,17 +184,21 @@ formAddCard.addEventListener("submit", (evt) => {
   const name = inputName.value;
   const link = inputLink.value;
 
-  const newCard = createCard(
-    { name, link },
-    deleteCard,
-    toggleLike,
-    handleCardClick,
-    userId
-  );
-  placesList.prepend(newCard);
-
-  formAddCard.reset();
-  closeModal(modalCard);
+  addNewCard(name, link)
+    .then((newCardData) => {
+      const newCardElement = createCard(
+        newCardData,
+        deleteCard,
+        toggleLike,
+        handleCardClick,
+        openDeletePopup,
+        userId
+      );
+      placesList.prepend(newCardElement);
+      formAddCard.reset();
+      closeModal(modalCard);
+    })
+    .catch((err) => console.error(err));
 });
 
 // Попап с изображением
