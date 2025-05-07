@@ -14,13 +14,16 @@
   </header>
   <main class="content">
     <section class="profile page__section">
-      <div class="profile__image" style="background-image: url(<%=require('./images/avatar.jpg')%>)"></div>
+      <div class="profile__image-container">
+        <div class="profile__image" style="background-image: url(<%=require('./images/avatar.jpg')%>)"></div>
+        <button class="profile__image-edit-button" type="button"></button>
+      </div>
       <div class="profile__info">
         <h1 class="profile__title">Жак-Ив Кусто</h1>
         <button class="profile__edit-button" type="button"></button>
         <p class="profile__description">Исследователь океана</p>
       </div>
-      <button class="profile__add-button" type="button"></button>
+      <button class="profile__add-button" type="button" aria-label="Обновить аватар"></button>
     </section>
     <section class="places page__section">
       <ul class="places__list">
@@ -58,6 +61,7 @@
       </form>
     </div>
   </div>
+
   <div class="popup popup_type_image">
     <div class="popup__content popup__content_content_image">
       <button type="button" class="popup__close"></button>
@@ -65,6 +69,19 @@
       <p class="popup__caption"></p>
     </div>
   </div>
+</div>
+
+<div class="popup popup_type_avatar-edit">
+  <div class="popup__content popup__content_content_avatar-edit">
+    <button type="button" class="popup__close"></button>
+    <h3 class="popup__title">Обновить аватар</h3>
+    <form class="popup__form" name="avatar-edit">
+      <input type="url" name="avatar" class="popup__input popup__input_type_avatar" required placeholder="Ссылка на картинку">
+      <span class="popup__error" id="avatar-error"></span>
+      <button type="submit" class="button popup__button">Сохранить</button>
+    </form>
+  </div>
+</div>
 </div>
 
 <div class="popup popup_type__card_delete">

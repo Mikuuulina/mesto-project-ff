@@ -7,6 +7,35 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.profile__image-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.profile__image-edit-button {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  top: 0;
+  left: 0;
+  background-image: url(/src/images/avatart_edit.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: transparent;
+  background-size: 26px 26px;
+  border: none;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.profile__image-container:hover .profile__image-edit-button {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 @media screen and (max-width: 740px) {
