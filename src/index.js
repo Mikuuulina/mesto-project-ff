@@ -66,12 +66,12 @@ const avatarimage = document.querySelector(".profile__avatar");
 const buttonClosePopupAvatar = avatarPopup.querySelector(".popup__close");
 
 // Переменные для попапа удаления карточки
-const modalDelete = document.querySelector(".popup_type__card_delete");
+const modalDelete = document.querySelector(".popup_type__card-delete");
 const buttonClosePopupDelete = modalDelete.querySelector(
-  ".popup__close_card_delete"
+  ".popup__close_card-delete"
 );
 const buttonDeleteCard = modalDelete.querySelector(
-  ".popup__button_card_delete"
+  ".popup__button_card-delete"
 );
 let currentCardId = null;
 
@@ -97,14 +97,18 @@ function handleCardClick(name, link) {
 
 // // Открытие попапа удаления
 function openDeletePopup(cardData) {
-  currentCardId = cardData._id;
   openModal(modalDelete);
 
   const onDelete = () => {
-    deleteCard(cardData.element);
-    deleteCardFromApi(currentCardId);
-    closeModal(modalDelete);
-    buttonDeleteCard.removeEventListener("click", onDelete);
+    deleteCardFromApi(cardData._id)
+      .then(() => {
+        deleteCard(cardData.element);
+        closeModal(modalDelete);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        buttonDeleteCard.removeEventListener("click", onDelete);
+      });
   };
 
   buttonDeleteCard.addEventListener("click", onDelete);

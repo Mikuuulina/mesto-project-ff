@@ -1,3 +1,5 @@
+import { putLikeOnCard, deleteLikeFromCard } from "./api.js";
+
 // Функция создания карточки
 
 export const cardTemplate = document.querySelector("#card-template");
@@ -34,22 +36,51 @@ export function createCard(
     cardButtonDelete.style.display = "none";
   }
 
-  cardButtonDelete.addEventListener("click", () => deleteCard(cardElement));
-  cardButtonLike.addEventListener("click", () => toggleLike(cardButtonLike));
-  likeCountElement.textContent = cardData.likes.length;
+  cardButtonLike.addEventListener("click", () =>
+    toggleLike(cardData, cardButtonLike, likeCountElement)
+  );
   cardImage.addEventListener("click", () =>
     handleCardClick(cardData.name, cardData.link)
   );
+
+  // Устанавливаем количество лайков
+  likeCountElement.textContent = cardData.likes.length;
+
+  // Проверяем, лайкал ли пользователь карточку
+  const isLikedByUser = cardData.likes.some((like) => like._id === userId);
+  if (isLikedByUser) {
+    cardButtonLike.classList.add("card__like-button_is-active");
+  }
 
   return cardElement;
 }
 
 // Функция удаления карточки
 export function deleteCard(card) {
-  card.remove();
+  if (card && card.remove) {
+    card.remove();
+  }
 }
 
 // Кнопка лайка
-export function toggleLike(button) {
-  button.classList.toggle("card__like-button_is-active");
+export function toggleLike(cardData, button, likeCountElement) {
+  const isLiked = button.classList.contains("card__like-button_is-active");
+
+  if (isLiked) {
+    deleteLikeFromCard(cardData._id)
+      .then((updatedCardData) => {
+        button.classList.remove("card__like-button_is-active");
+        cardData.likes = updatedCardData.likes;
+        likeCountElement.textContent = cardData.likes.length;
+      })
+      .catch((err) => console.error(err));
+  } else {
+    putLikeOnCard(cardData._id)
+      .then((updatedCardData) => {
+        button.classList.add("card__like-button_is-active");
+        cardData.likes = updatedCardData.likes;
+        likeCountElement.textContent = cardData.likes.length;
+      })
+      .catch((err) => console.error(err));
+  }
 }

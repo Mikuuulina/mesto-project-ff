@@ -27,5 +27,3 @@ export function overlayClose(evt) {
     closeModal(evt.target);
   }
 }
-
-

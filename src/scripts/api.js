@@ -56,3 +56,17 @@ export const updateAvatar = (link) => {
     body: JSON.stringify({ avatar: link }),
   }).then(handleResponse);
 };
+
+export const putLikeOnCard = (cardId) => {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+    method: "PUT",
+    headers: config.headers,
+  }).then(handleResponse);
+};
+
+export const deleteLikeFromCard = (cardId) => {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+    method: "DELETE",
+    headers: config.headers,
+  }).then(handleResponse);
+};
