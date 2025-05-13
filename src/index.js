@@ -62,7 +62,6 @@ const avatarEditButton = document.querySelector(".profile__image-edit-button");
 const avatarPopup = document.querySelector(".popup_type_avatar-edit");
 const avatarForm = avatarPopup.querySelector(".popup__form");
 const avatarInput = avatarForm.avatar;
-const avatarimage = document.querySelector(".profile__avatar");
 const buttonClosePopupAvatar = avatarPopup.querySelector(".popup__close");
 
 // Переменные для попапа удаления карточки
@@ -73,7 +72,6 @@ const buttonClosePopupDelete = modalDelete.querySelector(
 const buttonDeleteCard = modalDelete.querySelector(
   ".popup__button_card-delete"
 );
-let currentCardId = null;
 
 // Настройки валидации формы
 const validationConfig = {
@@ -91,28 +89,36 @@ function handleCardClick(name, link) {
   popupImage.src = link;
   popupImage.alt = name;
   popupCaptionImage.textContent = name;
-  modalImage.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
+  modalImage.classList.add("popup__content_image-background-open");
   openModal(modalImage);
 }
 
 // // Открытие попапа удаления
-function openDeletePopup(cardData) {
+let cardToDeleteId = null;
+let cardToDeleteElement = null;
+
+function openDeletePopup(cardId, cardElement) {
+  cardToDeleteId = cardId;
+  cardToDeleteElement = cardElement;
+
   openModal(modalDelete);
-
-  const onDelete = () => {
-    deleteCardFromApi(cardData._id)
-      .then(() => {
-        deleteCard(cardData.element);
-        closeModal(modalDelete);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        buttonDeleteCard.removeEventListener("click", onDelete);
-      });
-  };
-
-  buttonDeleteCard.addEventListener("click", onDelete);
 }
+
+// Обработчик кнопки подтверждения удаления
+buttonDeleteCard.addEventListener("click", () => {
+  if (!cardToDeleteId || !cardToDeleteElement) return;
+
+  deleteCardFromApi(cardToDeleteId)
+    .then(() => {
+      deleteCard(cardToDeleteElement);
+      closeModal(modalDelete);
+    })
+    .catch((err) => console.error(err))
+    .finally(() => {
+      cardToDeleteId = null;
+      cardToDeleteElement = null;
+    });
+});
 
 function renderLoading(isLoading, buttonElement, defaultText = "Сохранить") {
   buttonElement.textContent = isLoading ? "Сохранение..." : defaultText;
@@ -173,7 +179,7 @@ modalEdit.addEventListener("click", (evt) => {
 // Обработчик отправки формы редактирования профиля
 formPopupEdit.addEventListener("submit", (evt) => {
   evt.preventDefault();
-  renderLoading(true, formPopupEdit.querySelector(".popup__button"));
+  renderLoading(true, evt.submitter);
 
   const newName = nameInput.value;
   const newJob = jobInput.value;
@@ -186,7 +192,7 @@ formPopupEdit.addEventListener("submit", (evt) => {
     })
     .catch((err) => console.error(err))
     .finally(() => {
-      renderLoading(false, formPopupEdit.querySelector(".popup__button"));
+      renderLoading(false, evt.submitter);
     });
 });
 
@@ -233,7 +239,8 @@ modalImage.addEventListener("click", (evt) => {
     evt.target === modalImage ||
     evt.target.classList.contains("popup__close")
   ) {
-    modalImage.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    modalImage.classList.remove("popup__content_image-background-open");
+    modalImage.classList.add("popup__content_image-background-close");
     closeModal(modalImage);
   }
 });
@@ -241,6 +248,7 @@ modalImage.addEventListener("click", (evt) => {
 // Открытие попа обновления аватара
 avatarEditButton.addEventListener("click", () => {
   avatarInput.value = "";
+  clearValidation(avatarForm, validationConfig);
   openModal(avatarPopup);
 });
 
@@ -256,7 +264,7 @@ avatarForm.addEventListener("submit", (e) => {
 
   updateAvatar(avatarLink)
     .then((res) => {
-      avatarImage.src = res.avatar;
+      profileAvatar.style.backgroundImage = `url(${res.avatar})`;
       closeModal(avatarPopup);
     })
     .catch((err) => console.error(err))

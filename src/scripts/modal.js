@@ -8,6 +8,7 @@ export function openModal(popup) {
 // Функция закрытия попапа
 export function closeModal(popup) {
   popup.classList.remove("popup_is-opened");
+  popup.classList.remove("popup__content_image-background-open");
   document.removeEventListener("keydown", escClose);
   popup.removeEventListener("mousedown", overlayClose);
 }

@@ -16,22 +16,19 @@ function hideInputError(form, input, config) {
 
 // Проверяем валидность введённых данных в поле
 function checkInputValidity(form, input, config) {
-  const pattern = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/;
-
   if (!input.validity.valid) {
     if (input.validity.tooShort) {
       showInputError(
         form,
         input,
-        `Минимальное количество символов: ${input.minLength}. Длина текста сейчас: ${input.value.length}.`,
+        input.validationMessage,
         config
       );
-    } else if (input.value !== "" && !pattern.test(input.value)) {
+    } else if (input.validity.patternMismatch) {
       showInputError(
         form,
         input,
-        input.dataset.errorMessage ||
-          "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы",
+        input.dataset.errorMessage,
         config
       );
     } else {
@@ -43,9 +40,7 @@ function checkInputValidity(form, input, config) {
 }
 
 // Функция вкл/выкл кнопки в зависимости от валидности заполненных полей формы
-function toggleButtonState(form, config) {
-  const button = form.querySelector(config.submitButtonSelector);
-  const inputs = Array.from(form.querySelectorAll(config.inputSelector));
+function toggleButtonState(inputs, button, config) {
   const isValid = inputs.every((input) => input.validity.valid);
 
   if (isValid) {
@@ -58,13 +53,11 @@ function toggleButtonState(form, config) {
 }
 
 // Устанавливаем обработчики событий инпут для всех полей формы
-function setValidationListeners(form, config) {
-  const inputs = Array.from(form.querySelectorAll(config.inputSelector));
-
+function setValidationListeners(form, inputs, button, config) {
   inputs.forEach((input) => {
     input.addEventListener("input", () => {
       checkInputValidity(form, input, config);
-      toggleButtonState(form, config);
+      toggleButtonState(inputs, button, config);
     });
   });
 }
@@ -74,19 +67,21 @@ export function enableValidation(config) {
   const forms = document.querySelectorAll(config.formSelector);
 
   forms.forEach((form) => {
-    form.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-    });
+    const inputs = Array.from(form.querySelectorAll(config.inputSelector));
+    const button = form.querySelector(config.submitButtonSelector);
 
-    setValidationListeners(form, config);
-    toggleButtonState(form, config);
+    toggleButtonState(inputs, button, config);
+
+    setValidationListeners(form, inputs, button, config);
   });
 }
 
 // Очищаем ошибки валидации и обновляем состояние кнопки
 export function clearValidation(form, config) {
   const inputs = Array.from(form.querySelectorAll(config.inputSelector));
+  const button = form.querySelector(config.submitButtonSelector);
+
   inputs.forEach((input) => hideInputError(form, input, config));
 
-  toggleButtonState(form, config);
+  toggleButtonState(inputs, button, config);
 }

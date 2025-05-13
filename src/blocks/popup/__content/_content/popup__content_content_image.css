@@ -12,3 +12,11 @@
   border-radius: 0;
   padding: 0;
 }
+
+.popup__content_image-background-open {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.popup__content_image-background-close {
+  background-color: rgba(0, 0, 0, 0.5);
+}

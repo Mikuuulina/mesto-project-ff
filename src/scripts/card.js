@@ -26,12 +26,11 @@ export function createCard(
   cardImage.alt = cardData.name;
   cardTitle.textContent = cardData.name;
 
-  cardData.element = cardElement;
 
   // Показываем кнопку удаления только если карточка создана пользователем
   if (cardData.owner._id === userId) {
     cardButtonDelete.style.display = "block";
-    cardButtonDelete.addEventListener("click", () => openDeletePopup(cardData));
+    cardButtonDelete.addEventListener("click", () => openDeletePopup(cardData._id, cardElement));
   } else {
     cardButtonDelete.style.display = "none";
   }
